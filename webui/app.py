@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-df_flat = pd.read_csv('df_flat.csv')
+df_flat = pd.read_csv('./webui/df_flat.csv')
 print('-----------------------------------')
 
 def region_analytics(df_flat, target_type, target):
