@@ -46,6 +46,6 @@ with st.container():
 
    st.markdown('<p class="big-font">Welcome to AI Invest Property Dubai!</p>', unsafe_allow_html=True)
 
-   st.image('./imgs/dubai_palm.jpg')
+   st.image('./webui/imgs/dubai_palm.jpg')
 
 
