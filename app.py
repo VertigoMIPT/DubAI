@@ -23,14 +23,14 @@ show_pages(
         Page("./app.py", "Home", "🏠"),
 
         Section(name = "Analytics", icon="📊"),
-        Page("./pages/Region_Analytics.py", "Region Analytics", "🌍"),
-        Page("./pages/Unit_Analytics.py", "Unit Analytics", "🏛"),  
+        Page("./webui/pages/Region_Analytics.py", "Region Analytics", "🌍"),
+        Page("./webui/pages/Unit_Analytics.py", "Unit Analytics", "🏛"),  
         
         Section(name = "Predictive Tools", icon="📈"),
-        Page("./pages/Prediction_Tools.py", "Predictive Tools", "📈"),
+        Page("./webui/pages/Prediction_Tools.py", "Predictive Tools", "📈"),
 
         Section(name = "About us", icon="🚀"),
-        Page("./pages/About.py", "About us", "🚀")
+        Page("./webui/pages/About.py", "About us", "🚀")
         
     ]
 )
