@@ -2,40 +2,50 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from st_pages import Page, Section, show_pages, add_page_title
+import plotly.express as px
+
+try:
+    df_flat = pd.read_csv('./webui/df_flat.csv')
+except:
+    print('file not found')
+try:
+    df_flat = pd.read_csv('./df_flat.csv')
+except:
+    print('file not found')
 
 
-df_flat = pd.read_csv('./webui/df_flat.csv')
-print('-----------------------------------')
-
-def region_analytics(df_flat, target_type, target):
-    
-    target = str(target)
-    target_type = str(target_type)
-    print(target)
-
-    unique_id = df_flat[df_flat[target_type] == target].id.unique()
-    print(unique_id)
-    
-    tmp = df_flat[(df_flat['year'].isin([2019, 2020, 2021, 2022, 2024])) & (df_flat['id'].isin(unique_id))].groupby(['year', 'rooms_en']).actual_worth.mean()
-    tmp = pd.DataFrame(tmp).reset_index()
-    print('this is result tmp: ', tmp)
-#    tmp = st.dataframe(tmp)
-
-    sns.lineplot(x='year', y='actual_worth', hue='rooms_en', data=tmp)
-
-target_type = st.sidebar.text_input('Choose Target Type', 'nearest_mall_en')
-target = st.sidebar.text_input('Choose Target Name', 'Marina Mall')
-
-st.title(f'Mean prices for estates near given object: \n {target_type}  {target}')
-
-st.sidebar.subheader('Region Analytics')
+add_page_title()
 
 
+show_pages(
+    [
+        Page("app.py", "Home", "🏠"),
 
-fig = plt.figure(figsize=(10,4))
+        Section(name = "Analytics", icon="📊"),
+        Page("./pages/Region_Analytics.py", "Region Analytics", "🌍"),
+        Page("./pages/Unit_Analytics.py", "Unit Analytics", "🏛"),  
+        
+        Section(name = "Predictive Tools", icon="📈"),
+        Page("./pages/Prediction_Tools.py", "Predictive Tools", "📈"),
 
-region_analytics(df_flat = df_flat,
-                            target_type = target_type, 
-                            target = target)
+        Section(name = "About us", icon="🚀"),
+        Page("./pages/About.py", "About us", "🚀")
+        
+    ]
+)
+with st.container():
 
-st.pyplot(fig)
+   st.markdown("""
+    <style>
+    .big-font {
+    font-size:50px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+   st.markdown('<p class="big-font">Welcome to AI Invest Property Dubai!</p>', unsafe_allow_html=True)
+
+   st.image('./imgs/dubai_palm.jpg')
+
+
