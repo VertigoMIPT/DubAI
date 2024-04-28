@@ -20,7 +20,7 @@ add_page_title()
 
 show_pages(
     [
-        Page("app.py", "Home", "🏠"),
+        Page("./app.py", "Home", "🏠"),
 
         Section(name = "Analytics", icon="📊"),
         Page("./pages/Region_Analytics.py", "Region Analytics", "🌍"),
