@@ -12,6 +12,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import xgboost
 
 
+def encode(data,
+           col,
+           max_val):
+    
+    data[col + '_sin'] = np.sin(2 * np.pi * data[col]/max_val)
+    data[col + '_cos'] = np.cos(2 * np.pi * data[col]/max_val)
+    
+    return data
+
 class TargetEncode(BaseEstimator, TransformerMixin):
     
     def __init__(self, categories='auto', k=1, f=1, 
@@ -94,35 +103,62 @@ except:
     print('file not found')
 
 df_flat.drop(columns='index', inplace=True)
+df_flat['date'] = pd.to_datetime(df_flat['date'])
 
 with st.container():
 
-    area_name_en = tuple(df_flat.area_name_en.unique())
-    area_name_en = st.selectbox('Choose area_name_en: ', area_name_en)
-    
     building_name_en = tuple(df_flat.building_name_en.unique())
     building_name_en = st.selectbox('Choose building_name_en: ', building_name_en)
 
-    nearest_landmark_en = tuple(df_flat.nearest_landmark_en.unique())
-    nearest_landmark_en = st.selectbox('Choose nearest_landmark_en: ', nearest_landmark_en)
- 
-
-    nearest_metro_en = tuple(df_flat.nearest_metro_en.unique())
-    nearest_metro_en = st.selectbox('Choose nearest_metro_en: ', nearest_metro_en)
- 
-    nearest_mall_en = tuple(df_flat.nearest_mall_en.unique())
-    nearest_mall_en = st.selectbox('Choose nearest_mall_en: ', nearest_mall_en)
- 
-    has_parking = tuple(df_flat.has_parking.unique())
-    has_parking = st.selectbox('has_parking?: ', has_parking)
 
     rooms_en = tuple(df_flat.rooms_en.unique())
     rooms_en = st.selectbox('rooms_en?: ', rooms_en)
 
-
     procedure_area = st.text_input("Procedure area", 100)
     st.write("Procedure area: ", procedure_area)
+
+    area_name_en = df_flat[df_flat['building_name_en'] ==  building_name_en]['area_name_en'].unique()[0]
+    nearest_landmark_en = df_flat[df_flat['building_name_en'] == building_name_en]['nearest_landmark_en'].unique()[0]
+    nearest_metro_en = df_flat[df_flat['building_name_en'] == building_name_en]['nearest_metro_en'].unique()[0]
+    nearest_mall_en = df_flat[df_flat['building_name_en'] == building_name_en]['nearest_mall_en'].unique()[0]
+    has_parking = df_flat[df_flat['building_name_en'] == building_name_en]['has_parking'].unique()[0]   
+
+    year = tuple(df_flat.year.unique())
+    year = st.selectbox('Choose year: ', year)
+
+    print('------------------')
+    print(df_flat['date'].dt.day.unique())
+    print('------------------')
+
+    month = df_flat['date'].dt.month.unique()
+    month = tuple(month)
+    month = st.selectbox('Choose month: ', month)
+
+    day = df_flat['date'].dt.day.unique()
+    day = tuple(day)
+    day = st.selectbox('Choose day: ', day)
+
+    # building_name_en = tuple(df_flat.building_name_en.unique())
+    # building_name_en = st.selectbox('Choose building_name_en: ', building_name_en)
+
+    # area_name_en = tuple(df_flat.area_name_en.unique())
+    # area_name_en = st.selectbox('Choose area_name_en: ', area_name_en)
+
+
+    # nearest_landmark_en = tuple(df_flat.nearest_landmark_en.unique())
+    # nearest_landmark_en = st.selectbox('Choose nearest_landmark_en: ', nearest_landmark_en)
  
+
+    # nearest_metro_en = tuple(df_flat.nearest_metro_en.unique())
+    # nearest_metro_en = st.selectbox('Choose nearest_metro_en: ', nearest_metro_en)
+ 
+    # nearest_mall_en = tuple(df_flat.nearest_mall_en.unique())
+    # nearest_mall_en = st.selectbox('Choose nearest_mall_en: ', nearest_mall_en)
+ 
+    # has_parking = tuple(df_flat.has_parking.unique())
+    # has_parking = st.selectbox('has_parking?: ', has_parking)
+
+  
 
 ts_max = df_flat[(df_flat['area_name_en'] == area_name_en) & \
                    (df_flat['building_name_en'] == building_name_en) & \
@@ -155,12 +191,31 @@ te.fit(df_flat, df_flat['actual_worth'])
 
 tmp_encoded = te.transform(tmp)
 
-tmp_encoded.drop(columns = ['year','actual_worth','date'], inplace = True)
+
+tmp_encoded['date_year'] = year
+tmp_encoded['date_month'] = month
+tmp_encoded['date_day'] = day
 
 
-print('**************: ', tmp_encoded.head())
+tmp_encoded = encode(tmp_encoded,
+                'date_year',
+                max_val = 2024)
+
+
+tmp_encoded = encode(tmp_encoded,
+                'date_month',
+                max_val = 12)
+
+
+tmp_encoded = encode(tmp_encoded,
+                'date_day',
+                max_val = 31)
+
+
+tmp_encoded.drop(columns = ['year','actual_worth','date','date_year','date_month','date_day'], inplace = True)
+
+
 X = normalize(np.array(tmp_encoded))
-print('>>>>>>>>>>>>>>>> ', X.shape)
 
 
 xgb = pickle.load(open(xgb, "rb"))
